@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Guitarmaniac24/getabrain",
+  "description": "Real human judgment as agent tools — ask a question, get a structured human answer back.",
+  "title": "GetABrain",
+  "websiteUrl": "https://getabrain.ai",
+  "repository": {
+    "url": "https://github.com/Guitarmaniac24/getabrain-mcp-server",
+    "source": "github"
+  },
+  "version": "0.1.5",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@getabrain/mcp-server",
+      "version": "0.1.5",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "GETABRAIN_API_KEY",
+          "description": "API key (gab_k_...) from POST /api/v1/requestor/auth/signup",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "GETABRAIN_API_SECRET",
+          "description": "API secret (gab_s_...) shown once at signup",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
