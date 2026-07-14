@@ -7,12 +7,13 @@ function fakeClient() {
 }
 
 describe('createServer', () => {
-  it('builds an MCP server without throwing and registers all six tools', () => {
+  it('builds an MCP server without throwing and registers all seven tools', () => {
     const server: any = createServer(fakeClient())
     // McpServer exposes registered tools via its internal map; assert via the connect-less smoke:
     expect(server).toBeTruthy()
-    // The tool registry is validated indirectly: creating the server iterates the 6 tools.
-    // A direct count check on the exported `tools` array guards the wiring:
-    expect(tools.length).toBe(6)
+    // The tool registry is validated indirectly: creating the server iterates the 7 tools
+    // (Task 10 added create_topup_link). A direct count check on the exported `tools`
+    // array guards the wiring:
+    expect(tools.length).toBe(7)
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "@getabrain/mcp-server",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "MCP server for GetABrain.ai \u2014 real human judgment as agent tools",
   "type": "module",
   "bin": {
@@ -13,22 +13,18 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean --tsconfig tsconfig.build.json",
-    "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "@getabrain/sdk": "^0.1.1",
+    "@getabrain/sdk": "^0.2.0",
     "@modelcontextprotocol/sdk": "^1.18.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "tsup": "^8.0.0",
-    "typescript": "^5",
-    "vitest": "^3.2.0"
+    "tsup": "^8.0.0"
   },
   "license": "MIT",
   "mcpName": "io.github.Guitarmaniac24/getabrain",

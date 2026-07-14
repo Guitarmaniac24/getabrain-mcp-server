@@ -8,13 +8,13 @@
     "url": "https://github.com/Guitarmaniac24/getabrain-mcp-server",
     "source": "github"
   },
-  "version": "0.1.5",
+  "version": "0.2.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@getabrain/mcp-server",
-      "version": "0.1.5",
+      "version": "0.2.0",
       "transport": { "type": "stdio" },
       "environmentVariables": [
         {
