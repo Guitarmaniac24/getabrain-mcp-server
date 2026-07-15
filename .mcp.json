@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "getabrain": {
+      "command": "npx",
+      "args": ["-y", "@getabrain/mcp-server"],
+      "env": {
+        "GETABRAIN_API_KEY": "gab_k_your_key_here",
+        "GETABRAIN_API_SECRET": "gab_s_your_secret_here"
+      }
+    }
+  }
+}
