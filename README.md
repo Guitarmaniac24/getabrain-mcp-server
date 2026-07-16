@@ -23,6 +23,29 @@ Add to your MCP client config (e.g. `claude_desktop_config.json`):
 
 Get your API key by signing up at https://getabrain.ai.
 
+## Remote (hosted) MCP server -- no install
+
+Prefer not to run anything locally? GetABrain also hosts this same server over Streamable HTTP at
+`https://www.getabrain.ai/api/mcp`. Point any MCP client that supports remote servers at that URL and
+pass your key pair as headers instead of env vars:
+
+```json
+{
+  "mcpServers": {
+    "getabrain": {
+      "url": "https://www.getabrain.ai/api/mcp",
+      "headers": {
+        "X-API-Key": "gab_k_…",
+        "X-API-Secret": "gab_s_…"
+      }
+    }
+  }
+}
+```
+
+Same 7 tools, same schemas, same test-mode support -- see `docs/deploy/remote-mcp.md` in this repo for
+details (Smithery-style clients, auth requirements, etc).
+
 ## Test mode
 
 Test mode is a flag on the key, not a different key format. When you mint an API key — via

@@ -6,6 +6,14 @@ export interface ToolDef {
   name: string
   description: string
   inputShape: ZodRawShape
+  outputShape?: ZodRawShape
+  annotations?: {
+    title?: string
+    readOnlyHint?: boolean
+    destructiveHint?: boolean
+    idempotentHint?: boolean
+    openWorldHint?: boolean
+  }
   run: (args: any, client: GetABrain) => Promise<ToolResult>
 }
 
@@ -21,6 +29,15 @@ export const tools: ToolDef[] = [
       'Disambiguation: reports funds available to spend; does not list queries (list_queries) or responses ' +
       '(get_responses/wait_for_responses).',
     inputShape: {},
+    annotations: { title: 'Check prepaid balance', readOnlyHint: true, openWorldHint: true },
+    outputShape: {
+      balance_cents: z.number().optional(),
+      company_name: z.string().optional(),
+      mode: z.string().optional(),
+      auto_reload_enabled: z.boolean().optional(),
+      auto_reload_setup_url: z.string().optional(),
+      hint: z.string().optional(),
+    },
     run: async (_args, client) => {
       const b = await client.account.balance()
       return ok({
@@ -55,6 +72,14 @@ export const tools: ToolDef[] = [
             'E.g. 5000 = $50.00.'
         ),
     },
+    annotations: {
+      title: 'Create top-up payment link',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    outputShape: { checkout_url: z.string().optional() },
     run: async (args, client) => ok(await client.account.createTopupLink(args.amount_cents)),
   },
   {
@@ -93,8 +118,18 @@ export const tools: ToolDef[] = [
         .min(5)
         .max(10000000)
         .describe(
-          'Cents paid to EACH worker per accepted response (min 5 = $0.05, max 10000000 = $100,000.00). ' +
-            'Total cost = (bid_amount_cents + bonus_amount_cents) * required_responses, deducted from balance in live mode. No charge occurs in test mode.'
+          'Cents paid to EACH worker per accepted response (absolute floor 5 = $0.05, max 10000000 = $100,000.00). ' +
+            'The REAL minimum is effort-based, not flat: it scales with how long the query type honestly takes a worker to ' +
+            'answer, priced at a fair ~$9/hr (0.25 cents/second). Quick types (yes_no, multiple_choice, sentiment, ab_test, ' +
+            'headline_test, rating_scale) floor around 5 cents; medium types (image_comparison, image_selection, ranking, ' +
+            'text, image_analysis) around 8-12 cents; capture types (voice_capture, photo_capture, custom) around 15 cents; ' +
+            'longer types (free_form_text, video_capture) around 30 cents. video_review and audio_review scale with the ' +
+            'actual clip length (content_data.video_duration_seconds / audio_duration_seconds) plus a review/write-up ' +
+            'overhead, so a 10-minute video review requires roughly $1.65+ -- there is no upper cap, longer clips need ' +
+            'proportionally higher bids. Bidding below the type-appropriate minimum is rejected with a 400 telling you the ' +
+            'exact floor; call GET /requestor/suggested-bid?type=... for the current min_bid_cents and suggested_bid_cents ' +
+            'for a given type before submitting. Total cost = (bid_amount_cents + bonus_amount_cents) * required_responses, ' +
+            'deducted from balance in live mode. No charge occurs in test mode.'
         ),
       description: z.string().optional().describe('Optional longer explanation/context shown to workers alongside the title, for extra instructions or background.'),
       bonus_amount_cents: z
@@ -110,6 +145,21 @@ export const tools: ToolDef[] = [
         .optional()
         .describe('Optional minimum worker quality score (0-5) required to accept this query; higher restricts to more experienced/reliable workers.'),
     },
+    annotations: {
+      title: 'Ask human workers a question',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    outputShape: {
+      query_id: z.string().optional(),
+      id: z.string().optional(),
+      status: z.string().optional(),
+      required_responses: z.number().optional(),
+      total_cost_cents: z.number().optional(),
+      simulated: z.boolean().optional(),
+    },
     run: async (args, client) => ok(await client.queries.create(args)),
   },
   {
@@ -122,6 +172,13 @@ export const tools: ToolDef[] = [
       'which may be fewer than required_responses.',
     inputShape: {
       query_id: z.string().describe('The id returned by submit_query, identifying which query to read.'),
+    },
+    annotations: { title: 'Get query responses', readOnlyHint: true, openWorldHint: true },
+    outputShape: {
+      status: z.string().optional(),
+      completed_responses: z.number().optional(),
+      required_responses: z.number().optional(),
+      responses: z.array(z.any()).optional(),
     },
     run: async (args, client) => {
       const q = await client.queries.get(args.query_id)
@@ -158,6 +215,14 @@ export const tools: ToolDef[] = [
         .max(50)
         .optional()
         .describe('Maximum seconds to poll before giving up and returning status "pending" if not enough responses arrived yet (default 50, max 50).'),
+    },
+    annotations: { title: 'Wait for human responses', readOnlyHint: true, openWorldHint: true },
+    outputShape: {
+      status: z.string().optional(),
+      responses: z.array(z.any()).optional(),
+      completed_responses: z.number().optional(),
+      required_responses: z.number().optional(),
+      hint: z.string().optional(),
     },
     run: async (args, client) => {
       const current = await client.queries.get(args.query_id)
@@ -198,6 +263,14 @@ export const tools: ToolDef[] = [
         .describe('Optional filter to only return queries in this status (e.g. "active", "pending", "completed", "cancelled", "failed", "expired"). Omit to return all statuses.'),
       limit: z.number().int().min(1).max(100).optional().describe('Maximum number of queries to return, most recent first (1-100, default server-side).'),
     },
+    annotations: { title: 'List your queries', readOnlyHint: true, openWorldHint: true },
+    outputShape: {
+      queries: z.array(z.any()).optional(),
+      total: z.number().optional(),
+      limit: z.number().optional(),
+      offset: z.number().optional(),
+      has_more: z.boolean().optional(),
+    },
     run: async (args, client) => ok(await client.queries.list(args)),
   },
   {
@@ -215,6 +288,18 @@ export const tools: ToolDef[] = [
       response_id: z.string().describe('The id of the specific response to rate (from get_responses/wait_for_responses output).'),
       score: z.number().int().min(1).max(5).describe('Quality rating for the response, 1 (worst) to 5 (best). Feeds the worker\'s ongoing quality score.'),
       feedback_text: z.string().optional().describe('Optional free-text comment explaining the rating, visible to the worker.'),
+    },
+    annotations: {
+      title: 'Rate a worker response',
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+    outputShape: {
+      worker_quality_score: z.number().optional(),
+      success: z.boolean().optional(),
+      message: z.string().optional(),
     },
     run: async (args, client) =>
       ok(await client.responses.rate(args.query_id, args.response_id, { score: args.score, feedback_text: args.feedback_text })),

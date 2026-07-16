@@ -24,7 +24,8 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
-    "tsup": "^8.0.0"
+    "tsup": "^8.0.0",
+    "typescript": "^5"
   },
   "license": "MIT",
   "mcpName": "io.github.Guitarmaniac24/getabrain",

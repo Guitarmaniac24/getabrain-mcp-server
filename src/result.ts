@@ -4,11 +4,17 @@ import {
 
 export interface ToolResult {
   content: { type: 'text'; text: string }[]
+  structuredContent?: Record<string, unknown>
   isError?: boolean
 }
 
 export function ok(data: unknown): ToolResult {
-  return { content: [{ type: 'text', text: typeof data === 'string' ? data : JSON.stringify(data) }] }
+  const text = typeof data === 'string' ? data : JSON.stringify(data)
+  const res: ToolResult = { content: [{ type: 'text', text }] }
+  if (data !== null && typeof data === 'object' && !Array.isArray(data)) {
+    res.structuredContent = data as Record<string, unknown>
+  }
+  return res
 }
 
 export function fail(message: string): ToolResult {
