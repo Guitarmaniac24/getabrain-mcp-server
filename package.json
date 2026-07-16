@@ -12,7 +12,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --dts --clean --tsconfig tsconfig.build.json",
+    "build": "tsup src/index.ts --format esm --clean --tsconfig tsconfig.build.json",
     "prepublishOnly": "npm run build"
   },
   "engines": {
