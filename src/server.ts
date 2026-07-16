@@ -8,7 +8,7 @@ import { toToolError } from './result'
 // the ONLY file that depends on @modelcontextprotocol/sdk -- if a future SDK version
 // changes this registration contract, adapt only here.
 export function createServer(client: GetABrain): McpServer {
-  const server = new McpServer({ name: 'getabrain', version: '0.1.0' })
+  const server = new McpServer({ name: 'getabrain', version: '0.2.0' })
   for (const t of tools) {
     server.registerTool(
       t.name,
