@@ -1,6 +1,6 @@
 {
   "name": "@getabrain/mcp-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server for GetABrain.ai \u2014 real human judgment as agent tools",
   "type": "module",
   "bin": {
