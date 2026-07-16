@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./logo.png" alt="GetABrain" width="128" height="128" />
+</p>
+
 # @getabrain/mcp-server
 
 MCP server for [GetABrain.ai](https://getabrain.ai) — give your AI agent real human judgment as native tools.

@@ -4,6 +4,13 @@
   "description": "Real human judgment as agent tools — ask a question, get a structured human answer back.",
   "title": "GetABrain",
   "websiteUrl": "https://getabrain.ai",
+  "icons": [
+    {
+      "src": "https://www.getabrain.ai/logo.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"]
+    }
+  ],
   "repository": {
     "url": "https://github.com/Guitarmaniac24/getabrain-mcp-server",
     "source": "github"
